@@ -1,0 +1,21 @@
+services:
+  endpoint-genie:
+    image: endpoint-genie
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    networks:
+      - endpoint-genie-network
+
+networks:
+  endpoint-genie-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.58.0.0/16
