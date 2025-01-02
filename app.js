@@ -20,13 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware para interpretar JSON
 app.use(express.json());
 
-router.use(function (req,res,next) {
+router.use(function (req, res, next) {
     console.log('/' + req.method);
     next();
   });
  
 // Rota para cadastrar novos endpoints
-router.get('/', function(req,res){
+router.get('/', function(req, res){
     res.sendFile(viewsPath + 'index.html');
 });
 
@@ -66,7 +66,7 @@ const loadEndpointsFromFile = () => {
         lines.forEach(line => {
             if (line.trim()) {
                 const lineSplit = line.split(': ');
-                if(lineSplit.length != 5) {
+                if (lineSplit.length != 5) {
                     line = `${currentId}: ${line}`
                 }
                 
@@ -74,7 +74,7 @@ const loadEndpointsFromFile = () => {
 
                 if (idString && method && endpoint && jsonString && statusString) {
                     const id = parseInt(idString, 10);
-                    const json =JSON.parse(jsonString);
+                    const json = JSON.parse(jsonString);
                     const status = parseInt(statusString, 10);
                     
                     // Atualizar o ID atual se o ID carregado for maior
@@ -88,10 +88,28 @@ const loadEndpointsFromFile = () => {
         });
     }
 
-    saveEndpointsToFile(endpoints)
+    saveEndpointsToFile(endpoints);
 
     return endpoints;
 };
+
+// Função para recarregar os endpoints, removendo as rotas anteriores
+const reloadEndpoints = () => {
+    // Limpar todas as rotas dinâmicas antes de recarregar
+    /*app._router.stack = app._router.stack.filter(layer => !layer.route);
+
+    // Carregar e criar os novos endpoints
+    const loadedEndpoints = loadEndpointsFromFile();
+
+    return loadedEndpoints;*/
+    console.log(`Reload endpoints: ${loadedEndpoints.length}.`);
+};
+
+// Monitorar alterações no arquivo 'endpoints.txt'
+fs.watchFile(endpointsFilePath, { interval: 1000 }, (curr, prev) => {
+    console.log(`Arquivo ${endpointsFilePath} foi alterado!`);
+    reloadEndpoints(); // Recarregar os endpoints ao detectar uma alteração
+});
 
 // Carregar endpoints ao iniciar o servidor
 const loadedEndpoints = loadEndpointsFromFile();
